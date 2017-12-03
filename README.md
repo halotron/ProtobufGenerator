@@ -5,6 +5,7 @@ How to use it:
 1. Install the ProtobufGenerator VSIX file (just download and double click).
 2. Add "ProtobufGenerator" as Custom Tool for any proto file in your solution.
 3. If everything is OK, a C# file will be created as a child of the proto file after any changes.
+If not, see below.
 
 PREREQUISITE:
 Protoc.exe, contained in the nuget package Google.Protobuf.Tools, needs to be somewhere on your system. NOT necessarily in the project you are working with.
