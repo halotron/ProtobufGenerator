@@ -13,6 +13,7 @@ PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
         <Identity Id="7B2BD99C-EC9E-47DA-A1E4-77F8AC425159" Version="1.0" Language="en-US" Publisher="Microsoft" />
         <DisplayName>C# Single File Generator Sample</DisplayName>
         <Description xml:space="preserve">ProtobufGenerator - Generate C# from protobuf file using protoc</Description>
+        <MoreInfo>https://github.com/halotron/ProtobufGenerator</MoreInfo>
         <License>LICENSE.txt</License>
         <Icon>protogen.ico</Icon>
         <PreviewImage>ProtobufGenerator.png</PreviewImage>
