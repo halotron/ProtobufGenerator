@@ -2,7 +2,7 @@
 A plugin for Visual Studio that will automatically transform protobuf proto-files into generated C# code.
 
 How to use it:
-1. Install the ProtobufGenerator VSIX file (just download and double click).
+1. Install the ProtobufGenerator VSIX file (just download and double click). https://marketplace.visualstudio.com/items?itemName=jonasjakobsson.ProtobufGeneratorvisualstudio
 2. Add "ProtobufGenerator" as Custom Tool for any proto file in your solution.
 3. If everything is OK, a C# file will be created as a child of the proto file after any changes.
 If not, see below.
