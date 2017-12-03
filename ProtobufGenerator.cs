@@ -30,6 +30,7 @@ namespace Knacka.Se.ProtobufGenerator
     [ComVisible(true)]
     [Guid("10B050D0-1362-4692-A351-2BB29F63F711")]
     [CodeGeneratorRegistration(typeof(ProtobufGenerator), "ProtobufGenerator - Generate C# from proto files", vsContextGuids.vsContextGuidVCSProject, GeneratesDesignTimeSource = true)]
+    [CodeGeneratorRegistration(typeof(ProtobufGenerator), "ProtobufGenerator - Generate C# from proto files", "{9A19103F-16F7-4668-BE54-9A1E7A4F7556}", GeneratesDesignTimeSource = true)]
     [ProvideObject(typeof(ProtobufGenerator))]
     public class ProtobufGenerator : BaseCodeGeneratorWithSite
     {
