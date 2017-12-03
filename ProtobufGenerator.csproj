@@ -19,7 +19,7 @@ PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
     </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>ProtobufSigningKey.pfx</AssemblyOriginatorKeyFile>
@@ -203,7 +203,10 @@ PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="LICENSE" />
     <None Include="ProtobufSigningKey.pfx" />
+    <None Include="README.md" />
+    <None Include="signvsix.ps1" />
     <None Include="source.extension.vsixmanifest" />
   </ItemGroup>
   <ItemGroup>
