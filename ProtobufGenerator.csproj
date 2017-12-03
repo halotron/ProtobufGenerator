@@ -18,6 +18,12 @@ PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>ProtobufSigningKey.pfx</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -197,6 +203,7 @@ PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="ProtobufSigningKey.pfx" />
     <None Include="source.extension.vsixmanifest" />
   </ItemGroup>
   <ItemGroup>

@@ -3,3 +3,8 @@
 ################################################################################
 
 /.vs/ProtobufGenerator/v15/Server/sqlite3/db.lock
+/.vs/ProtobufGenerator/v15
+/bin
+/obj
+/packages
+/ProtobufGenerator.csproj.user
