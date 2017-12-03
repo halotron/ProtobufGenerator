@@ -20,6 +20,6 @@ using System.Resources;
 [assembly: AssemblyCopyright("Copyright © jonas@knacka.se")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]		
-[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyVersion("1.1.0.0")]
 [assembly: AssemblyDelaySign(false)]
 [assembly: NeutralResourcesLanguageAttribute("en-US")]
