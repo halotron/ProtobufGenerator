@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace Knacka.Se.ProtobufGenerator
 {
@@ -65,6 +66,26 @@ namespace Knacka.Se.ProtobufGenerator
             return path;
         }
 
+        private static string ScanDirectoryForProtoc(string tmpPackagesDir, string googleProtobufToolsName, string pathInPackage)
+        {
+            if (Directory.Exists(tmpPackagesDir))
+            {
+                var dirName = Directory.GetDirectories(tmpPackagesDir)
+                    .FirstOrDefault(x =>
+                        Path.GetFileName(x)?.ToLower().StartsWith(googleProtobufToolsName) ?? false);
+                if (!string.IsNullOrEmpty(dirName))
+                {
+                    var tmpPath = Path.Combine(dirName, pathInPackage);
+                    if (File.Exists(tmpPath))
+                    {
+                        return tmpPath;
+                    }
+                }
+            }
+
+            return null;
+        }
+
         private string FindExeInLocalPackages(string googleProtobufToolsName, string pathInPackage)
         {
             if (!string.IsNullOrEmpty(_localFilepath))
@@ -72,22 +93,26 @@ namespace Knacka.Se.ProtobufGenerator
                 var tmpDir = _localFilepath;
                 while (Directory.Exists(tmpDir))
                 {
-                    var tmpPackagesDir = Path.Combine(tmpDir, "packages");
-                    if (Directory.Exists(tmpPackagesDir))
-                    {
-                        var dirName = Directory.GetDirectories(tmpPackagesDir)
-                            .Where(x => x.StartsWith(googleProtobufToolsName))
-                            .FirstOrDefault();
-                        if (!string.IsNullOrEmpty(dirName))
-                        {
-                            var tmpPath = Path.Combine(dirName, pathInPackage);
-                            if (File.Exists(tmpPath))
-                            {
-                                return tmpPath;
-                            }
-                        }
+                    var result = ScanDirectoryForProtoc(Path.Combine(tmpDir, "packages"), googleProtobufToolsName, pathInPackage);
+                    if (!string.IsNullOrEmpty(result))
+                        return result;
 
+                    var nugetConfig = Path.Combine(tmpDir, "nuget.config");
+                    if (File.Exists(nugetConfig))
+                    {
+                        var doc = XElement.Load(nugetConfig);
+                        var nugetPath = doc.Element("config")?.Elements("add")
+                            .FirstOrDefault(el => el.Attribute("key")?.Value == "repositoryPath")?.Attribute("value")
+                            ?.Value;
+                        if (nugetPath != null)
+                        {
+                            nugetPath = Path.IsPathRooted(nugetPath) ? nugetPath : Path.Combine(tmpDir, nugetPath);
+                            result = ScanDirectoryForProtoc(nugetPath, googleProtobufToolsName, pathInPackage);
+                            if (result != null)
+                                return result;
+                        }
                     }
+
                     try
                     {
                         tmpDir = Directory.GetParent(tmpDir).FullName;
@@ -125,7 +150,7 @@ namespace Knacka.Se.ProtobufGenerator
                     }
                 }
             }
-            return path;
+            return null;
         }
 
         static string FindExePath(string exe)
