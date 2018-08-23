@@ -86,7 +86,5 @@ namespace Knacka.Se.ProtobufGenerator
                 return null;
             }
         }
-
-
     }
 }
