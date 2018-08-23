@@ -18,28 +18,15 @@ namespace Knacka.Se.ProtobufGenerator
             _protocPath = protocPath;
         }
 
-        public byte[] GenerateCsharpFromProto(string protoContent, string protoDirPath, string infile)
+        public byte[] GenerateCsharpFromProto(string protoPath)
         {
             if (string.IsNullOrEmpty(_protocPath))
                 return null;
 
             string stdout, stderr;
 
-            string infileDir = GetTempDir();
-
-            // Copy specified proto file to the working temp directory.
-            var originalInfile = Path.Combine(protoDirPath, infile);
-            File.Copy(originalInfile, Path.Combine(infileDir, infile));
-
-            // Copy imported proto files to the same directory so that protoc can find them.
-            foreach (var importedPath in GetImportedProtoPaths(protoContent))
-            {
-                var dest = Path.Combine(infileDir, importedPath);
-                Directory.CreateDirectory(Path.GetDirectoryName(dest));
-
-                File.Copy(Path.Combine(protoDirPath, importedPath), dest);
-            }
-
+            string infile = Path.GetFileName(protoPath);
+            string infileDir = Path.GetDirectoryName(protoPath); // without last '\'
             string outdir = GetTempDir();
 
             var exitCode = RunProtoc(_protocPath, $"--csharp_out={outdir} --proto_path={infileDir} {infile}", infileDir, out stdout, out stderr);
@@ -51,23 +38,12 @@ namespace Knacka.Se.ProtobufGenerator
                 if (File.Exists(first))
                 {
                     var content = File.ReadAllBytes(first);
-                    CleanTempDir(infileDir);
                     CleanTempDir(outdir);
                     return content;
                 }
             }
-            CleanTempDir(infileDir);
             CleanTempDir(outdir);
             return null;
-        }
-
-        private static string[] GetImportedProtoPaths(string protoContent)
-        {
-            return Regex.Split(protoContent, @"\r?\n")
-                .Where((x) => x.StartsWith("import"))
-                .Select((x) => Regex.Match(x, @"""(.*)""").Groups[1].Value)
-                .Select((x) => x.Replace("/", "\\"))
-                .ToArray();
         }
 
         private static void CleanTempDir(string outdir)

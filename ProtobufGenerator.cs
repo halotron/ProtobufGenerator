@@ -72,7 +72,7 @@ namespace Knacka.Se.ProtobufGenerator
                 {
                     this.CodeGeneratorProgress.Progress(50, 100);
                 }
-                var res = generator.GenerateCsharpFromProto(inputFileContent, path, name);
+                var res = generator.GenerateCsharpFromProto(Path.Combine(path, name));
                 if (this.CodeGeneratorProgress != null)
                 {
                     this.CodeGeneratorProgress.Progress(100, 100);
