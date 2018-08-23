@@ -32,9 +32,12 @@ namespace Knacka.Se.ProtobufGenerator
             File.Copy(originalInfile, Path.Combine(infileDir, infile));
 
             // Copy imported proto files to the same directory so that protoc can find them.
-            foreach (var imported in GetImportedProtoPaths(protoContent, protoDirPath))
+            foreach (var importedPath in GetImportedProtoPaths(protoContent))
             {
-                File.Copy(imported, Path.Combine(infileDir, Path.GetFileName(imported)));
+                var dest = Path.Combine(infileDir, importedPath);
+                Directory.CreateDirectory(Path.GetDirectoryName(dest));
+
+                File.Copy(Path.Combine(protoDirPath, importedPath), dest);
             }
 
             string outdir = GetTempDir();
@@ -58,12 +61,12 @@ namespace Knacka.Se.ProtobufGenerator
             return null;
         }
 
-        private static string[] GetImportedProtoPaths(string protoContent, string protoDirPath)
+        private static string[] GetImportedProtoPaths(string protoContent)
         {
             return Regex.Split(protoContent, @"\r?\n")
                 .Where((x) => x.StartsWith("import"))
                 .Select((x) => Regex.Match(x, @"""(.*)""").Groups[1].Value)
-                .Select((x) => Path.Combine(protoDirPath, x))
+                .Select((x) => x.Replace("/", "\\"))
                 .ToArray();
         }
 
