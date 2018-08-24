@@ -31,6 +31,11 @@ namespace Knacka.Se.ProtobufGenerator
 
             var exitCode = RunProtoc(_protocPath, $"--csharp_out={outdir} --proto_path={infileDir} {infile}", infileDir, out stdout, out stderr);
 
+            if (!string.IsNullOrEmpty(stderr))
+            {
+                throw new InvalidOperationException(stderr);
+            }
+
             var files = Directory.GetFiles(outdir);
             if (files != null && files.Any())
             {
