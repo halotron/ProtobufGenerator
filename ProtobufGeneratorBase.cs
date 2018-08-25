@@ -38,7 +38,7 @@ namespace Knacka.Se.ProtobufGenerator
         protected override byte[] GenerateCode(string inputFileContent)
         {
             var vsItem = this.GetVSProjectItem();
-            var name = vsItem?.ProjectItem?.Name;
+            var name = vsItem?.ProjectItem?.Document?.Name;
             var path = vsItem?.ProjectItem?.Document?.Path;
 
             if (_protocPath == null)
@@ -68,7 +68,7 @@ namespace Knacka.Se.ProtobufGenerator
                 {
                     this.CodeGeneratorProgress.Progress(50, 100);
                 }
-                var res = generator.GenerateCsharpFromProto(inputFileContent, path, inputFile);
+                var res = generator.GenerateCsharpFromProto(Path.Combine(path, name));
                 if (this.CodeGeneratorProgress != null)
                 {
                     this.CodeGeneratorProgress.Progress(100, 100);
