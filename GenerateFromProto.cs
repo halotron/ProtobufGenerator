@@ -20,14 +20,14 @@ namespace Knacka.Se.ProtobufGenerator
             _grpcPath = grpcPath;
         }
 
-        public byte[] GenerateCsharpFromProto(string protoContent, string protoDirPath, string protoName)
+        public byte[] GenerateCsharpFromProto(string protoPath)
         {
             if (string.IsNullOrEmpty(_protocPath))
                 return null;
 
-            var tempDir = GetTempDirs(out var indir, out var outdir);
-            var infile = Path.Combine(indir, protoName);
-            File.WriteAllText(infile, protoContent);
+            string infile = Path.GetFileName(protoPath);
+            string indir = Path.GetDirectoryName(protoPath); // without last '\'
+            string outdir = GetTempDir();
 
             var args = $"--csharp_out={outdir} --proto_path={indir} {infile}";
             if (!string.IsNullOrEmpty(_grpcPath))
@@ -39,6 +39,11 @@ namespace Knacka.Se.ProtobufGenerator
 
             Debug.WriteIf(stdout.Length > 0, stdout);
             Debug.WriteIf(stderr.Length > 0, stderr);
+
+            if (!string.IsNullOrEmpty(stderr))
+            {
+                throw new InvalidOperationException(stderr);
+            }
 
             var files = Directory.GetFiles(outdir);
             if (files?.Any() == true)
@@ -71,11 +76,11 @@ namespace Knacka.Se.ProtobufGenerator
                         if(pass == 0) sw.WriteLine("\r\n#endregion");
                         sw.Flush();
                     }
-                    CleanTempDir(tempDir);
+                    CleanTempDir(outdir);
                     return ms.ToArray();
                 }
             }
-            CleanTempDir(tempDir);
+            CleanTempDir(outdir);
             return null;
         }
 
@@ -90,7 +95,7 @@ namespace Knacka.Se.ProtobufGenerator
             }
         }
 
-        private static string GetTempDirs(out string inDir, out string outDir)
+        private static string GetTempDir()
         {
             var tmpPath = Path.GetTempPath();
             var tries = 100;
@@ -103,8 +108,6 @@ namespace Knacka.Se.ProtobufGenerator
                     try
                     {
                         Directory.CreateDirectory(path);
-                        Directory.CreateDirectory(inDir = Path.Combine(path, "input"));
-                        Directory.CreateDirectory(outDir = Path.Combine(path, "output"));
                         return path;
                     }
                     catch (Exception x)
@@ -114,7 +117,7 @@ namespace Knacka.Se.ProtobufGenerator
                     }
                 }
             }
-            return inDir = outDir = null;
+            return null;
         }
 
         static int RunProtoc(string path, string arguments, string workingDir, out string stdout, out string stderr)
