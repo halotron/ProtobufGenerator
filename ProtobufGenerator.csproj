@@ -164,6 +164,7 @@ PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
     <Reference Include="System.Xml">
       <Name>System.XML</Name>
     </Reference>
+    <Reference Include="System.Xml.Linq" />
     <Reference Include="VSLangProj">
     </Reference>
     <Reference Include="VSLangProj2">
