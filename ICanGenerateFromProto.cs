@@ -8,6 +8,6 @@ namespace Knacka.Se.ProtobufGenerator
 {
     public interface ICanGenerateFromProto
     {
-        byte[] GenerateCsharpFromProto(string protoContent, string protoDirPath);
+        byte[] GenerateCsharpFromProto(string protoContent, string protoDirPath, string protoName);
     }
 }

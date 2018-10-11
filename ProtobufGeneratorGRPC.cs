@@ -1,4 +1,4 @@
-/***************************************************************************
+﻿/***************************************************************************
 
 Copyright (c) Microsoft Corporation. All rights reserved.
 This code is licensed under the Visual Studio SDK license terms.
@@ -28,18 +28,18 @@ namespace Knacka.Se.ProtobufGenerator
     /// to the project system
     /// </summary>
     [ComVisible(true)]
-    [Guid("10B050D0-1362-4692-A351-2BB29F63F711")]
-    [CodeGeneratorRegistration(typeof(ProtobufGenerator), "ProtobufGenerator - Generate C# from proto files", vsContextGuids.vsContextGuidVCSProject, GeneratesDesignTimeSource = true)]
-    [CodeGeneratorRegistration(typeof(ProtobufGenerator), "ProtobufGenerator - Generate C# from proto files", TempNetSdkProjectGuid, GeneratesDesignTimeSource = true)]
-    [ProvideObject(typeof(ProtobufGenerator))]
-    public class ProtobufGenerator : ProtobufGeneratorBase
+    [Guid("52FD1149-33FA-4DD3-AC44-AB655C27671C")]
+    [CodeGeneratorRegistration(typeof(ProtobufGeneratorGRPC), "ProtobufGeneratorGRPC - Generate C# from proto files", vsContextGuids.vsContextGuidVCSProject, GeneratesDesignTimeSource = true)]
+    [CodeGeneratorRegistration(typeof(ProtobufGeneratorGRPC), "ProtobufGeneratorGRPC - Generate C# from proto files", TempNetSdkProjectGuid, GeneratesDesignTimeSource = true)]
+    [ProvideObject(typeof(ProtobufGeneratorGRPC))]
+    public class ProtobufGeneratorGRPC : ProtobufGeneratorBase
     {
 #pragma warning disable 0414
         //The name of this generator (use for 'Custom Tool' property of project item)
-        internal static string name = "ProtobufGenerator";
+        internal static string name = "ProtobufGeneratorGRPC";
 #pragma warning restore 0414
 
-        protected override bool GenerateGRPC => false;
+        protected override bool GenerateGRPC => true;
 
     }
 }

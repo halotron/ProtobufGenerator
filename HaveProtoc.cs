@@ -12,76 +12,72 @@ namespace Knacka.Se.ProtobufGenerator
     public class HaveProtoc : IHaveProtoc
     {
 
-        private string _path = null;
-        private string _localFilepath;
+        const string ProtoBufToolsPackage = "google.protobuf.tools";
+        const string GrpcToolsPackage = "grpc.tools";
+        const string ProtoCBinary = "protoc.exe";
+        const string GrpcPluginBinary = "grpc_csharp_plugin.exe";
+        const string BinPath64 = @"tools\windows_x64\" + ProtoCBinary;
+        const string BinPath32 = @"tools\windows_x86\" + ProtoCBinary;
 
-        public HaveProtoc(string path)
+        private string _protocPath = null;
+        private string _grpcPath = null;
+        private bool _grpc;
+        private string _localFilepath;
+        private string _toolsPackage;
+
+        public HaveProtoc(string path, bool grpc = false)
         {
             _localFilepath = path;
+            _grpc = grpc;
+            _toolsPackage = grpc ? GrpcToolsPackage : ProtoBufToolsPackage;
         }
 
-        public bool HaveFoundProtoc
-        {
-            get
-            {
-                if (_path == null)
-                    _path = TryResolvePath();
-                return _path != null;
-            }
-        }
+        public bool HaveFoundProtoc 
+            => ProtocPath != null;
 
-        public string ProtocPath
-        {
-            get
-            {
-                if (_path == null)
-                    _path = TryResolvePath();
-                return _path;
-            }
-        }
+        public string ProtocPath 
+            => _protocPath ?? (_protocPath = TryResolvePath());
+
+        public bool HaveFoundGprc 
+            => GrpcPath != null;
+
+        public string GrpcPath 
+            => _grpcPath ?? (_grpcPath = TryResolveGrpcPath());
 
         private string TryResolvePath()
         {
-            var path = FindExePath("protoc.exe");
+            var path = FindExePath(ProtoCBinary);
 
             if (string.IsNullOrEmpty(path))
             {
                 if (Environment.Is64BitOperatingSystem)
                 {
-                    path = FindExeInProfileNugets("google.protobuf.tools", "tools\\windows_x64\\protoc.exe");
-                    if (path == null)
-                    {
-                        path = FindExeInLocalPackages("google.protobuf.tools", "tools\\windows_x64\\protoc.exe");
-                    }
+                    path = FindExeInProfileNugets(_toolsPackage, BinPath64)
+                        ?? FindExeInLocalPackages(_toolsPackage, BinPath64);
                 }
                 else
                 {
-                    path = FindExeInProfileNugets("google.protobuf.tools", "tools\\windows_x86\\protoc.exe");
-                    if (path == null)
-                    {
-                        path = FindExeInLocalPackages("google.protobuf.tools", "tools\\windows_x86\\protoc.exe");
-                    }
+                    path = FindExeInProfileNugets(_toolsPackage, BinPath32)
+                        ?? FindExeInLocalPackages(_toolsPackage, BinPath32);
                 }
             }
+
             return path;
         }
 
-        private static string ScanDirectoryForProtoc(string tmpPackagesDir, string googleProtobufToolsName, string pathInPackage)
+        private string TryResolveGrpcPath()
         {
-            if (Directory.Exists(tmpPackagesDir))
+            var protocPath = ProtocPath;
+            if (!string.IsNullOrEmpty(protocPath))
             {
-                var dirName = Directory.GetDirectories(tmpPackagesDir)
-                    .FirstOrDefault(x =>
-                        Path.GetFileName(x)?.ToLower().StartsWith(googleProtobufToolsName) ?? false);
-                if (!string.IsNullOrEmpty(dirName))
+                var grpcPath = Path.Combine(Path.GetDirectoryName(protocPath), GrpcPluginBinary);
+                if (File.Exists(grpcPath))
                 {
-                    var tmpPath = Path.Combine(dirName, pathInPackage);
-                    if (File.Exists(tmpPath))
-                    {
-                        return tmpPath;
-                    }
+                    return grpcPath;
                 }
+                // else: protoc exists, but no plugin found
             }
+            // else: no protoc found
 
             return null;
         }
@@ -93,26 +89,22 @@ namespace Knacka.Se.ProtobufGenerator
                 var tmpDir = _localFilepath;
                 while (Directory.Exists(tmpDir))
                 {
-                    var result = ScanDirectoryForProtoc(Path.Combine(tmpDir, "packages"), googleProtobufToolsName, pathInPackage);
-                    if (!string.IsNullOrEmpty(result))
-                        return result;
-
-                    var nugetConfig = Path.Combine(tmpDir, "nuget.config");
-                    if (File.Exists(nugetConfig))
+                    var tmpPackagesDir = Path.Combine(tmpDir, "packages");
+                    if (Directory.Exists(tmpPackagesDir))
                     {
-                        var doc = XElement.Load(nugetConfig);
-                        var nugetPath = doc.Element("config")?.Elements("add")
-                            .FirstOrDefault(el => el.Attribute("key")?.Value == "repositoryPath")?.Attribute("value")
-                            ?.Value;
-                        if (nugetPath != null)
+                        var dirName = Directory.GetDirectories(tmpPackagesDir)
+                            .Where(x => x.StartsWith(googleProtobufToolsName))
+                            .FirstOrDefault();
+                        if (!string.IsNullOrEmpty(dirName))
                         {
-                            nugetPath = Path.IsPathRooted(nugetPath) ? nugetPath : Path.Combine(tmpDir, nugetPath);
-                            result = ScanDirectoryForProtoc(nugetPath, googleProtobufToolsName, pathInPackage);
-                            if (result != null)
-                                return result;
+                            var tmpPath = Path.Combine(dirName, pathInPackage);
+                            if (File.Exists(tmpPath))
+                            {
+                                return tmpPath;
+                            }
                         }
-                    }
 
+                    }
                     try
                     {
                         tmpDir = Directory.GetParent(tmpDir).FullName;
@@ -150,7 +142,7 @@ namespace Knacka.Se.ProtobufGenerator
                     }
                 }
             }
-            return null;
+            return path;
         }
 
         static string FindExePath(string exe)
