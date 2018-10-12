@@ -184,6 +184,7 @@ PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
     <Compile Include="HaveProtoc.cs" />
     <Compile Include="ICanGenerateFromProto.cs" />
     <Compile Include="IHaveProtoc.cs" />
+    <Compile Include="Logger.cs" />
     <Compile Include="ProtobufGenerator.cs" />
     <Compile Include="ProtobufGeneratorBase.cs" />
     <Compile Include="ProtobufGeneratorGRPC.cs" />
