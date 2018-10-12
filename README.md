@@ -2,6 +2,8 @@
 A plugin for Visual Studio that will automatically transform protobuf proto-files into generated C# code.
 Currently it does not support a proto file with declarations from a different file. Everything needed in the proto file needs to be in the proto file.
 
+GRPC is supported as well. See below.
+
 How to use it:
 1. Install the ProtobufGenerator VSIX file from here: https://marketplace.visualstudio.com/items?itemName=jonasjakobsson.ProtobufGeneratorvisualstudio
 2. Add "ProtobufGenerator" as Custom Tool for any proto file in your solution. (look in properties for the file)
@@ -19,5 +21,12 @@ It searches for protoc.exe in these locations in order:
 3. Then it searches in the current folder of the proto-file being generated from. If it finds a packages-folder it will search for Google.Protobuf.Tools inside of that.
 4. It will search in parent directories of the generated file for the packages folder. So if your packages folder is c:\src\packages it will find the Google.Protobuf.Tools there if the file being generated is in c:\src\some\distant\folder\hello.proto
 
+
+GRPC support:
+Use "ProtobufGeneratorGRPC" instead of "ProtobufGenerator".
+Same story: Grpc needs to be somewhere...
+
+Logging:
+outputs logging and the complete command that is executed to the general output pane in visual studio, or to the debug pane, if for some reason output pane is not available.
 
 Currently supports Visual Studio 2017 and might work with 2013 and 2015 as well. Try it and report on your success.
