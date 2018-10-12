@@ -46,7 +46,9 @@ namespace Knacka.Se.ProtobufGenerator
 
                 Logger.Log("Running:   " + _protocPath + " " + args + " in working directory:" + indir);
 
-                var exitCode = RunProtoc(_protocPath, args, indir, out string stdout, out string stderr);
+                string stderr = null;
+                string stdout = null;
+                var exitCode = RunProtoc(_protocPath, args, indir, out stdout, out stderr);
 
                 Logger.LogIf(() => exitCode != 0,
                     () => "exitcode was " + exitCode +
