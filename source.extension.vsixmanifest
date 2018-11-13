@@ -10,7 +10,7 @@ PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
 -->
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="7B2BD99C-EC9E-47DA-A1E4-77F8AC425159" Version="1.0" Language="en-US" Publisher="Jonas Jakobsson" />
+        <Identity Id="7B2BD99C-EC9E-47DA-A1E4-77F8AC425159" Version="1.2" Language="en-US" Publisher="Jonas Jakobsson" />
         <DisplayName>ProtobufGenerator  Generate C# from proto file</DisplayName>
         <Description xml:space="preserve">ProtobufGenerator - Generate C# from protobuf file using protoc</Description>
         <MoreInfo>https://github.com/halotron/ProtobufGenerator</MoreInfo>
