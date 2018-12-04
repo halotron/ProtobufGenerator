@@ -29,4 +29,18 @@ Same story: Grpc needs to be somewhere...
 Logging:
 outputs logging and the complete command that is executed to the general output pane in visual studio, or to the debug pane, if for some reason output pane is not available.
 
+Protobuf Argument Support :boom: Waring this may have unintended consequences :boom:
+Support for extra protoc cli arguments is provided on a per file basis by placing a comment of the form // ProtobufGenerator-Arg:__arg_name__:__arg_value__. This will generate the following input to protoc --arg_name arg_value. Arguments may be defined multiple times which may be helpful in the case of proto path (note all import paths are relative to file being transformed).
+Example
+```
+/// ProtobufGenerator-Arg:proto_path:../packages/Google.Protobuf.Tools.3.6.1/tools/
+/// ProtobufGenerator-Arg:proto_path:../OtherLibrary/
+
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "SharedProtos.proto";
+```
+The above example generates the following parameters to be passed to protoc --proto_path ../packages/Google.Protobuf.Tools.3.6.1/tools/ --proto_path ../OtherLibrary
+
 Currently supports Visual Studio 2017 and might work with 2013 and 2015 as well. Try it and report on your success.
