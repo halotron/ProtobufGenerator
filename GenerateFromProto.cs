@@ -22,7 +22,6 @@ namespace Knacka.Se.ProtobufGenerator
             _protocPath = protocPath;
             _grpcPath = grpcPath;
         }
-
         
 
         public byte[] GenerateCsharpFromProto(string protoPath)
@@ -30,7 +29,7 @@ namespace Knacka.Se.ProtobufGenerator
             if (string.IsNullOrEmpty(_protocPath))
                 return null;
             string indir = null;
-            string args = null;
+            var args = new Dictionary<string, List<string>>();
             try
             {
 
@@ -38,22 +37,28 @@ namespace Knacka.Se.ProtobufGenerator
                 indir = Path.GetDirectoryName(protoPath);
                 string outdir = GetTempDir();
 
-                args = $"--csharp_out={outdir} --proto_path={indir} {infile}";
+                args.Add("csharp_out", new List<string>(new string[] { outdir }));
+                args.Add("proto_path", new List<string>(new string[] { indir }));
                 if (!string.IsNullOrEmpty(_grpcPath))
                 {
-                    args = string.Concat(args, " --plugin=protoc-gen-grpc=", _grpcPath, " --grpc_out=", outdir);
+                    args.Add("plugin", new List<string>(new string[] { "protoc-gen-grpc=" + _grpcPath }));
+                    args.Add("grpc_out", new List<string>(new string[] { outdir }));
                 }
 
-                Logger.Log("Running:   " + _protocPath + " " + args + " in working directory:" + indir);
+                GetFileArguments(protoPath, ref args);
+
+                var argsValue = WriteArgs(infile, ref args);
+
+                Logger.Log("Running:   " + _protocPath + " " + argsValue + " in working directory:" + indir);
 
                 string stderr = null;
                 string stdout = null;
-                var exitCode = RunProtoc(_protocPath, args, indir, out stdout, out stderr);
+                var exitCode = RunProtoc(_protocPath, argsValue, indir, out stdout, out stderr);
 
                 Logger.LogIf(() => exitCode != 0,
                     () => "exitcode was " + exitCode +
                           ". You might have a problem generating the code here. Command: " +
-                          _protocPath + " " + args + " in working directory: " + indir);
+                          _protocPath + " " + argsValue + " in working directory: " + indir);
 
                 Logger.LogIf(() => stdout.Length > 0, () => "stdout: " + stdout);
                 Logger.LogIf(() => stderr.Length > 0, () => "stderr: " + stderr);
@@ -151,6 +156,56 @@ namespace Knacka.Se.ProtobufGenerator
                 }
             }
             return null;
+        }
+
+        private static string CommentArgumentLineRegex = "^///? ?ProtobufGenerator-Arg:([^:]*)(:(.*))?";
+        private void GetFileArguments(string protoPath, ref Dictionary<string, List<string>> args)
+        {
+            if (!File.Exists(protoPath))
+            {
+                return;
+            }
+
+            using (var fileReader = File.OpenRead(protoPath))
+            using (var streamReader = new StreamReader(fileReader))
+            {
+                while(!streamReader.EndOfStream)
+                {
+                    var line = streamReader.ReadLine();
+                    var match = Regex.Match(line, CommentArgumentLineRegex);
+                    if (!match.Success)
+                    {
+                        continue;
+                    }
+
+
+                    var argName = match.Groups[1].Value;
+                    var argValue = match.Groups[match.Groups.Count - 1].Value;
+
+                    if (args.ContainsKey(argName))
+                    {
+                        args[argName].Add(argValue);
+                    }
+                    else
+                    {
+                        args.Add(argName, new List<string>(new string[] { argValue }));
+                    }
+                }
+            }
+        }
+
+        private string WriteArgs(string protoFile, ref Dictionary<string, List<string>> args)
+        {
+            var sb = new StringBuilder();
+            foreach (var kvp in args)
+            {
+                foreach (var argInstance in kvp.Value)
+                {
+                    sb.AppendFormat("--{0}={1} ", kvp.Key, argInstance);
+                }
+            }
+            sb.AppendFormat(" {0}", protoFile);
+            return sb.ToString();
         }
 
         static int RunProtoc(string path, string arguments, string workingDir, out string stdout, out string stderr)
