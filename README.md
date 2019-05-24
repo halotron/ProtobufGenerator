@@ -1,4 +1,7 @@
 # ProtobufGenerator
+
+NOTE: Currently this is not maintained anymore due to lack of time and altered priorities.
+
 A plugin for Visual Studio that will automatically transform protobuf proto-files into generated C# code.
 Currently it does not support a proto file with declarations from a different file. Everything needed in the proto file needs to be in the proto file.
 
