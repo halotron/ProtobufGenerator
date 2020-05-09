@@ -29,6 +29,7 @@ namespace Knacka.Se.ProtobufGenerator
             if (string.IsNullOrEmpty(_protocPath))
                 return null;
             string indir = null;
+            string argsValue = null;
             var args = new Dictionary<string, List<string>>();
             try
             {
@@ -37,28 +38,28 @@ namespace Knacka.Se.ProtobufGenerator
                 indir = Path.GetDirectoryName(protoPath);
                 string outdir = GetTempDir();
 
-                args.Add("csharp_out", new List<string>(new string[] { outdir }));
-                args.Add("proto_path", new List<string>(new string[] { indir }));
+                args.Add("csharp_out", new List<string> { $"\"{outdir}\"" });
+                args.Add("proto_path", new List<string> { $"\"{indir}\"" });
                 if (!string.IsNullOrEmpty(_grpcPath))
                 {
-                    args.Add("plugin", new List<string>(new string[] { "protoc-gen-grpc=" + _grpcPath }));
-                    args.Add("grpc_out", new List<string>(new string[] { outdir }));
+                    args.Add("plugin", new List<string> { $"protoc-gen-grpc=\"{_grpcPath }\"" });
+                    args.Add("grpc_out", new List<string> { $"\"{outdir}\"" });
                 }
 
                 GetFileArguments(protoPath, ref args);
 
-                var argsValue = WriteArgs(infile, ref args);
+                argsValue = WriteArgs(infile, ref args);
 
-                Logger.Log("Running:   " + _protocPath + " " + argsValue + " in working directory:" + indir);
+                Logger.Log($"Running:   \'{_protocPath}\' {argsValue} in working directory:\'{indir}\'");
 
                 string stderr = null;
                 string stdout = null;
                 var exitCode = RunProtoc(_protocPath, argsValue, indir, out stdout, out stderr);
 
                 Logger.LogIf(() => exitCode != 0,
-                    () => "exitcode was " + exitCode +
-                          ". You might have a problem generating the code here. Command: " +
-                          _protocPath + " " + argsValue + " in working directory: " + indir);
+                    () => $"exitcode was {exitCode}. " +
+                          $"You might have a problem generating the code here. Command: " +
+                          $"\'{_protocPath}\' {argsValue} in working directory: \'{indir}\'");
 
                 Logger.LogIf(() => stdout.Length > 0, () => "stdout: " + stdout);
                 Logger.LogIf(() => stderr.Length > 0, () => "stderr: " + stderr);
@@ -112,11 +113,11 @@ namespace Knacka.Se.ProtobufGenerator
             catch (Exception e)
             {
                 var msg = e.Message ?? e.ToString();
-                Logger.Log("unhandled exception: " + msg);
+                Logger.Log($"unhandled exception: {msg}");
             }
             finally
             {
-                Logger.Log("Done with: " + _protocPath + " " + args + " in working directory:" + indir);
+                Logger.Log($"Done with: \'{_protocPath}\' {argsValue} in working directory:\'{indir}\'");
             }
             return null;
         }
@@ -150,7 +151,7 @@ namespace Knacka.Se.ProtobufGenerator
                     }
                     catch (Exception x)
                     {
-                        Logger.Log($"{x.GetType().Name}: {x.Message}, could not: create path \"{path}\"");
+                        Logger.Log($"{x.GetType().Name}: {x.Message}, could not: create path \'{path}\'");
                         break;
                     }
                 }
